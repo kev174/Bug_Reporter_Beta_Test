@@ -20,8 +20,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 
 public class amazonS3Api {
 
-	private static String appId = "AKIAJ5VZIEJOX3CNWRYQ";
-	private static String appSecret = "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";
+	private static String appId =   "AKIAIOLZTAWRAYO46NHA";
+	private static String appSecret = "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";
 	private final static String BUCKETNAME = "bug-reporter-bucket";
 	// String Bucket__Name = "bug-reporter-bucket-" + UUID.randomUUID();
 
