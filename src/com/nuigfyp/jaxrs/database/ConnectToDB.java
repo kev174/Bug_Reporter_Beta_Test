@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import com.nuigfyp.jaxrs.model.Bug;
-import com.nuigfyp.jaxrs.service.BugReporterService;
+import com.nuigfyp.jaxrs.model.Credentials;
+//import com.nuigfyp.jaxrs.service.BugReporterService;
 import com.nuigfyp.jaxrs.service.amazonS3Api;
 
 
@@ -17,7 +18,9 @@ public class ConnectToDB implements ConnectToDBInter {
 
 	private final static Logger log = Logger.getLogger(ConnectToDB.class);
 	private List<Bug> bugList = new ArrayList<>();
+	private List<Credentials> credentials = new ArrayList<>();
 	private String bugDatabaseName = "bug_reporter";  // filesDatabaseName = "bug_files"; Both used on both DB
+	private String credentialsDB = "credentials";
 	// NUIG 
 	//private String databaseLink = "jdbc:mysql://mysql1.it.nuigalway.ie:3306/mydb2976?autoReconnect=true&useSSL=false";
 	//private String un = "mydb2976ck", pw = "fa4nel";  
@@ -370,8 +373,45 @@ public class ConnectToDB implements ConnectToDBInter {
 		return bugList;
 	}
 	
+	
+	public List<Credentials> getAllUsersCredentials() {
+		
+		try {
+
+			Class.forName("com.mysql.jdbc.Driver"); // this is REQUIRED for a Maven project API			
+			Connection myConnection = DriverManager.getConnection(databaseLink, un, pw);
+			Statement connectToDBStatement = myConnection.createStatement();
+			ResultSet myResultSet = connectToDBStatement.executeQuery("Select * from " + credentialsDB);
+					
+			while (myResultSet.next()) {
+				int a = myResultSet.getInt("id");
+				String b = myResultSet.getString("fullname");
+				String c = myResultSet.getString("username");
+				String d = myResultSet.getString("password");
+				String e = myResultSet.getString("role");	
+				
+				Credentials userCredential = new Credentials(a, b, c, d, e);				
+				credentials.add(userCredential);		 // Checkout Arraylist in SMT Backend.dao.imp.AlertsDAOImp. pom.xml		
+			}
+			
+			connectToDBStatement.close();
+			myConnection.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Failure in ConnectToDB.getAllUsersCredentials().");
+        	JOptionPane.showMessageDialog(null, "getAllUsersCredentials(): getAllUsersCredentials exception. ", "General Exception.", JOptionPane.INFORMATION_MESSAGE);
+        	log.error("Exception at ConnectToDB.getAllUsersCredentials(). " + e);
+        	// When this occurs the Ajax keeps rotating and users can't access the app. return a null value and from BugReporterServiceImpl 
+        	// do two Responses with one ok and the other fail.
+		}
+
+		return credentials;
+	}
+	
+	
 	// Dont think this is used at all
-	public Map<Integer, Bug> getBugMap() {
+	/*public Map<Integer, Bug> getBugMap() {
 		
 		Map<Integer, Bug> bugMap = new HashMap<Integer, Bug>();
 		
@@ -411,7 +451,7 @@ public class ConnectToDB implements ConnectToDBInter {
 		}
 
 		return bugMap;
-	}
+	}*/
 	
 
 	public String deleteFileIfExists(String s3DeleteThisFile) { 

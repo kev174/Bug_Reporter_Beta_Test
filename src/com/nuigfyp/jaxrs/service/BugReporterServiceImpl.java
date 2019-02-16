@@ -2,12 +2,9 @@ package com.nuigfyp.jaxrs.service;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +23,11 @@ import javax.ws.rs.core.MediaType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nuigfyp.jaxrs.model.CustomResponse;
+//import com.nuigfyp.model.Base64Coding;
 import com.nuigfyp.jaxrs.database.ConnectToDB;
 import com.nuigfyp.jaxrs.model.Bug;
+import com.nuigfyp.jaxrs.model.Credentials;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.log4j.Logger;
@@ -44,9 +44,11 @@ public class BugReporterServiceImpl implements BugReporterService {
 
 	private final static Logger log = Logger.getLogger(BugReporterServiceImpl.class);
 	public List<Bug> bugList = new ArrayList<>();
+	private List<Credentials> credentials = new ArrayList<>();
 	private ConnectToDB db;
 	private Base64Coding base64;
-	private Map<Long, String> liveSessionsMap = new HashMap<Long, String>();
+	private static Map<Long, DateTime> liveSessionsMap = new HashMap<Long, DateTime>();
+	
 	
 	@POST
 	@Path("/upload")
@@ -288,87 +290,104 @@ public class BugReporterServiceImpl implements BugReporterService {
 	@Override
 	@RolesAllowed("ADMIN")
 	@GET
-	@Path("/getAll")
+	@Path("/getAll/{sid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllBugsInDB() {
+	public Response getAllBugsInDB(@PathParam("sid") String sid) {
 		
-		db = new ConnectToDB();
-		bugList = db.getAllBugs();	
-		
-		return Response.ok(bugList).build();
+		base64 = new Base64Coding();
+		String decodedSid = base64.decode(sid);
+		long sessionId = Long.valueOf(decodedSid);
+
+		if(validSessionId(sessionId)) {
+			db = new ConnectToDB();
+			bugList = db.getAllBugs();	
+			return Response.ok(bugList).build();
+		} else {
+			return Response.status(401).entity("Unauthorized Request").build();
+		}
 	}
 	
 	
 	@GET
-	@Path("/getSessionId/{loginInfo}")
+	@Path("/getSessionId/{userLoginInfo}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSessionId(@PathParam("loginInfo") String Id) {
+	public Response getSessionId(@PathParam("userLoginInfo") String userLoginInfo) {
 		
-		// *********** generate random Long number **************
-		long leftLimit = 1L;
-		long rightLimit = 1000000000L;
-		long generatedSessionId = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
-			
-		Date dateTime = null;
+		// *********** ID contains user:Admin **************
+		base64 = new Base64Coding();
+		long leftLimit = 1L, rightLimit = 1000000000L, generatedSessionId = 0;
+		String decoded = (base64.decode(userLoginInfo));		
+		String[] data = decoded.split(":", 2);
+		String un = data[0], pw = data[1]; 
+		DateTime currentDate = DateTime.now();
 		
-		String usernameInDB = "user";
-		String passwordInDB = "Admin";
-		
-		base64 = new Base64Coding();			
-		String decoded = (base64.decode(Id));	
-		String[] data = decoded.split(":", 3);
+		String usernameInDB = "", passwordInDB = "";	
+		db = new ConnectToDB();		
+		credentials = db.getAllUsersCredentials();
 
-		// I need to check if the Username and Password exists in the Database.		
-		String un = data[0];
-		String pw = data[1];
-		String sessId = data[2];
+		if (credentials.size() > 0) {
+			for (Credentials result : credentials) {
+				usernameInDB = result.getUsername();
+				passwordInDB = result.getPassword();
+				if (un.equals(usernameInDB) && pw.equals(passwordInDB)) {
+					generatedSessionId = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
+					liveSessionsMap.put(generatedSessionId, currentDate);
+					System.out.println("User exists in the Database: " + usernameInDB + ", Password: " + passwordInDB);
+					String returnString = (base64.encode(generatedSessionId + ":" + currentDate));
+					return Response.ok(returnString).build();
+				} else {
+					System.out.println("I DONT exist in the Database: ");
+					return Response.status(400).entity("No").build();
+				}
+			}
+		} 
 
-		String pattern = "MM/dd/yyyy HH:mm:ss"; // String pattern = "E MM/dd/yyyy HH:mm:ss";
-		DateTime currentTime = DateTime.now();
-		DateTime currentTimePlusFive = DateTime.now();
-		currentTimePlusFive = currentTime.plusMinutes(5);
-		//System.out.println("Time Plus Five minutes Formatted Is: " + currentTimePlusFive.toString(pattern));
+		//String pattern = "MM/dd/yyyy HH:mm:ss"; 		
+		DateTime currentDatePlusFive = currentDate.plusMinutes(5);
 		
-		if (currentTimePlusFive.compareTo(currentTime) < 1) {
-            System.out.println("currentTimePlusFive is AFTER currentTime. So Yes, This is a Valid Session ID.");
+		if (currentDate.compareTo(currentDatePlusFive) < 1) {
+            System.out.println("*CurrentTimePlusFive is AFTER currentTime. So Yes, This is a Valid Session ID..");
         }
 		
-		String formattedCurrentTime = currentTime.toString(pattern);
 		
-		if(un.equals(usernameInDB) && pw.equals(passwordInDB)) {
-			
-			liveSessionsMap.put((long)123456789, currentTimePlusFive.toString(pattern));
-			liveSessionsMap.put(generatedSessionId, formattedCurrentTime);
-			
-			/*String ct = credentials.get(generatedSessionId).toString();
-			System.out.println("Hashmap with Key " + generatedSessionId + ", Contains a Date: " + credentials.get(generatedSessionId).toString());		
-			try {
-				dateTime = new SimpleDateFormat(pattern).parse(ct);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}			
-			System.out.println("Date is now " + dateTime);*/
-		}
-		
-		//System.out.println("Is the key '123456789' present? " + credentials.containsKey(generatedSessionId));
-		//String tmp = credentials.get(generatedSessionId);
-		//System.out.println("Date received for SessionId Long 123456789 is: " + tmp);
-		
-		
-		
-		//System.out.println("Generated long number " + generatedSessionId + ", From the REST API." + ". Name: " + un + ", Passowrd: " + pw);
-		String returnString = (base64.encode(generatedSessionId + ":" + currentTime));
-		
+		generatedSessionId = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
+		liveSessionsMap.put(generatedSessionId, currentDate);
+		//System.out.println("User exists in the Database: " + usernameInDB + ", Password: " + passwordInDB);
+		String returnString = (base64.encode(generatedSessionId + ":" + currentDate));
 		return Response.ok(returnString).build();
+		
+		//return Response.status(400).entity("No").build();
+		
+		// String formattedCurrentTime = currentDate.toString(pattern);		
+		// System.out.println("formattedCurrentTime is " + formattedCurrentTime);
+		
+		//Long temp = new Long(123456789);
+		//liveSessionsMap.put(temp, currentTimePlusFive);
 	}
 	
+	public boolean validSessionId(Long sid) {
+
+		if(liveSessionsMap.containsKey(sid)) {
+			//System.out.println("The session Long sent to this API is " + sid + ", and exists in the Hashmap.");
+			return true;
+		}
+		
+		return false;
+		
+		/* ITERAGTE THROUGH HASHMAP
+		 * for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) { Long key =
+		 * entry.getKey(); Object value = entry.getValue();
+		 * System.out.println("Iterating through Hashmap " + key); }
+		 */
+	}
 	
 	// I DONT THINK THIS IS USED
 	/*@Path("/{id}/getSpecificBug/{pk}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Bug getDummyBug(@PathParam("id") String id, @PathParam("pk") String pk) {
 		System.out.println("id is " + id + ", pk is " + pk);*/
-	@GET
+	
+	/*@GET
 	@Path("/{id}/getSpecificBug")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Bug getDummyBug(@PathParam("id") String id) {
@@ -394,7 +413,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 
 		return aBug;
 	}
-
+*/
 
 	/*public List<Bug> getAllBugs() {			
 		db = new ConnectToDB();

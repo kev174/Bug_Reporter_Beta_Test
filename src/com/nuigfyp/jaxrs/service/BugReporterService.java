@@ -19,7 +19,7 @@ public interface BugReporterService {
 	
 	public Response deleteBug(String id);
 		
-	public Response getAllBugsInDB();
+	public Response getAllBugsInDB(String sid);
 
 	public Response changeBugStatus(String Id);	
 	
