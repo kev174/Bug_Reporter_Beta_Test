@@ -13,15 +13,15 @@ public interface BugReporterService {
 	
 	public Response downloadFile(String fn);
 	
-	public Response addBugReport(Bug bug);
+	public Response addBugReport(String sid, Bug bug);
 	
-	public Response updateBug(String id, Bug bug);
+	public Response updateBug(String id, String sid,Bug bug);
 	
-	public Response deleteBug(String id);
+	public Response deleteBug(String id, String sid);
 		
 	public Response getAllBugsInDB(String sid);
 
-	public Response changeBugStatus(String Id);	
+	public Response changeBugStatus(String Id, String sid);	
 	
 	// **** public Bug GETSpecificBugObject(String primaryKey);
 

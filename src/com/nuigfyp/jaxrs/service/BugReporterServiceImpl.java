@@ -165,8 +165,8 @@ public class BugReporterServiceImpl implements BugReporterService {
 	
 	@Override // THIS MEANS THAT THE INTERFACE MUST CONTAIN THIS METHOD
 	@POST
-    @Path("/addBug")
-	public Response addBugReport(Bug bug) { 
+    @Path("/addBug/{sid}")
+	public Response addBugReport(@PathParam("sid") String sid, Bug bug) { 
 	
 		// -----------------------------------------------------------------------------------------------------------------------
 		// Change from customResponse to Response like '/upload' above. customResponse is good when looking for reply from POSTMAN
@@ -175,15 +175,18 @@ public class BugReporterServiceImpl implements BugReporterService {
 		db = new ConnectToDB();		
 		boolean createdBugEntryInDatabase = false;
 		
-		try {
-			createdBugEntryInDatabase = db.addEntry(bug);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			log.error("General Exception at BugReporterServiceImpl.addBugReport(). " + e);
-			System.out.println("Failed to Add a Bug.");
-			customResponse.setStatus(true);
-			customResponse.setMessage("Failed to Add a Bug with reporters name: " + bug.getReporterName()); 			
-			return Response.status(400).entity("Bad Request Error.").build();	
+		
+		if (validSessionId(sid)) {
+			try {
+				createdBugEntryInDatabase = db.addEntry(bug);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				log.error("General Exception at BugReporterServiceImpl.addBugReport(). " + e);
+				System.out.println("Failed to Add a Bug.");
+				customResponse.setStatus(true);
+				customResponse.setMessage("Failed to Add a Bug with reporters name: " + bug.getReporterName());
+				return Response.status(400).entity("Bad Request Error.").build();
+			}
 		}
 		
 		if(createdBugEntryInDatabase) {
@@ -191,6 +194,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 		} else {
 			return Response.status(400).entity("Bad Request Error.").build();
 		}
+		
 		/*customResponse.setStatus(true);
 		//customResponse.setMessage("Bug created successfully? " + createdBugEntryInDatabase + ", for reporter " + bug.getReporterName()); 
 		customResponse.setMessage("200");*/ 
@@ -200,20 +204,23 @@ public class BugReporterServiceImpl implements BugReporterService {
 	
 	
 	@PUT
-    @Path("/{id}/updateBug")
-	public Response updateBug(@PathParam("id") String id, Bug bug) { 
+    @Path("/{id}/updateBug/{sid}")
+	public Response updateBug(@PathParam("id") String id, @PathParam("sid") String sid, Bug bug) { 
 	
 		db = new ConnectToDB();	
 		base64 = new Base64Coding();				
 		int bugId = Integer.parseInt(base64.decode(id));		
-		String updateBugEntryInDatabase;
+		String updateBugEntryInDatabase = "";
 		
-		try {
-			updateBugEntryInDatabase = db.updateDB(bug, bugId);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			log.error("General Exception at BugReporterServiceImpl.updateBug(). " + e);
-			return Response.status(400).entity("Failed to Add a Bug with reporters name: " + bug.getReporterName()).build();
+		if (validSessionId(sid)) {
+			try {
+				updateBugEntryInDatabase = db.updateDB(bug, bugId);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				log.error("General Exception at BugReporterServiceImpl.updateBug(). " + e);
+				return Response.status(400).entity("Failed to Add a Bug with reporters name: " + bug.getReporterName())
+						.build();
+			}
 		}
 		
 		//customResponse.setStatus(true);
@@ -225,25 +232,27 @@ public class BugReporterServiceImpl implements BugReporterService {
 	
 	@Override
 	@DELETE
-    @Path("/deletebug/{bugid}") // @Consumes(MediaType.APPLICATION_JSON) // not required as is in the header above
+    @Path("/deletebug/{bugid}/{sid}") // @Consumes(MediaType.APPLICATION_JSON) // not required as is in the header above
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteBug(@PathParam("bugid") String Id) {
+	public Response deleteBug(@PathParam("bugid") String Id, @PathParam("sid") String sid) {
 			
 		db = new ConnectToDB();
 		base64 = new Base64Coding();
 		int bugId = Integer.parseInt(base64.decode(Id));
 			
-		try {
-			db.deleteBugAndFiles(bugId);
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			log.error("General Exception at BugReporterServiceImpl.deleteBug(). " + e);
-			/*CustomResponse response = new CustomResponse();
-			response.setStatus(false);
-			response.setMessage("Bug failed to deletes: " + bugId);
-			return response;*/
-			
-			return Response.status(400).entity("400").build();
+		if (validSessionId(sid)) {
+			try {
+				db.deleteBugAndFiles(bugId);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				log.error("General Exception at BugReporterServiceImpl.deleteBug(). " + e);
+				/*
+				 * CustomResponse response = new CustomResponse(); response.setStatus(false);
+				 * response.setMessage("Bug failed to deletes: " + bugId); return response;
+				 */
+
+				return Response.status(400).entity("400").build();
+			}
 		}
 		
 		/*CustomResponse response = new CustomResponse();
@@ -256,9 +265,9 @@ public class BugReporterServiceImpl implements BugReporterService {
 	
 	@Override
 	@PUT
-    @Path("/changeBugStatus/{bugid}") 
+    @Path("/changeBugStatus/{bugid}/{sid}") 
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response changeBugStatus(@PathParam("bugid") String Id) {
+	public Response changeBugStatus(@PathParam("bugid") String Id, @PathParam("sid") String sid) {
 			
 		db = new ConnectToDB();
 		base64 = new Base64Coding();
@@ -267,16 +276,21 @@ public class BugReporterServiceImpl implements BugReporterService {
 		int bugId = Integer.parseInt(base64.decode(Id));
 			
 		System.out.println("Changed Bug Status API: ID is " + bugId);
-		try {
-			db.changeBugStatus(bugId, todaysDate); 
-		} catch (SQLException e) {			
-			e.printStackTrace();
-			log.error("General Exception at BugReporterServiceImpl.changeBugStatus(). " + e);
-			//CustomResponse response = new CustomResponse();
-			/*response.setStatus(false);
-			response.setMessage("Bug failed to change status: " + bugId);*/
-			return Response.status(400).entity("Changed Status successfull: " + bugId).build();
-			//return response;
+		
+		if (validSessionId(sid)) {
+			try {
+				db.changeBugStatus(bugId, todaysDate);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				log.error("General Exception at BugReporterServiceImpl.changeBugStatus(). " + e);
+				// CustomResponse response = new CustomResponse();
+				/*
+				 * response.setStatus(false);
+				 * response.setMessage("Bug failed to change status: " + bugId);
+				 */
+				return Response.status(400).entity("Changed Status successfull: " + bugId).build();
+				// return response;
+			}
 		}
 		
 		/*CustomResponse response = new CustomResponse();
@@ -294,11 +308,11 @@ public class BugReporterServiceImpl implements BugReporterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllBugsInDB(@PathParam("sid") String sid) {
 		
-		base64 = new Base64Coding();
+		/*base64 = new Base64Coding();
 		String decodedSid = base64.decode(sid);
-		long sessionId = Long.valueOf(decodedSid);
+		long sessionId = Long.valueOf(decodedSid);*/
 
-		if(validSessionId(sessionId)) {
+		if(validSessionId(sid)) {
 			db = new ConnectToDB();
 			bugList = db.getAllBugs();	
 			return Response.ok(bugList).build();
@@ -365,9 +379,13 @@ public class BugReporterServiceImpl implements BugReporterService {
 		//liveSessionsMap.put(temp, currentTimePlusFive);
 	}
 	
-	public boolean validSessionId(Long sid) {
+	public boolean validSessionId(String sid) {
 
-		if(liveSessionsMap.containsKey(sid)) {
+		base64 = new Base64Coding();
+		String decodedSid = base64.decode(sid);
+		long sessionId = Long.valueOf(decodedSid);
+		
+		if(liveSessionsMap.containsKey(sessionId)) {
 			//System.out.println("The session Long sent to this API is " + sid + ", and exists in the Hashmap.");
 			return true;
 		}

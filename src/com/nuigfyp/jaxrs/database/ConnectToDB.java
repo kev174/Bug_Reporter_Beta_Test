@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import com.nuigfyp.jaxrs.model.Bug;
 import com.nuigfyp.jaxrs.model.Credentials;
+//import com.nuigfyp.jaxrs.model.Credentials;
 //import com.nuigfyp.jaxrs.service.BugReporterService;
 import com.nuigfyp.jaxrs.service.amazonS3Api;
 
