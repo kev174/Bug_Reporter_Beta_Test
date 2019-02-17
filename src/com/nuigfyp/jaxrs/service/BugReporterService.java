@@ -2,6 +2,8 @@ package com.nuigfyp.jaxrs.service;
 
 import java.io.File;
 import java.util.List;
+
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import com.nuigfyp.jaxrs.model.Bug;
 import com.nuigfyp.jaxrs.model.CustomResponse;
@@ -22,6 +24,8 @@ public interface BugReporterService {
 	public Response getAllBugsInDB(String sid);
 
 	public Response changeBugStatus(String Id, String sid);	
+	
+	public Bug getSpecificBug(String id);
 	
 	// **** public Bug GETSpecificBugObject(String primaryKey);
 

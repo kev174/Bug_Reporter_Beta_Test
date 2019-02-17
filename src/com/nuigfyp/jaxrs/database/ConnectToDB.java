@@ -161,9 +161,9 @@ public class ConnectToDB implements ConnectToDBInter {
 		Bug currentBugInDatabase = new Bug();
 		currentBugInDatabase = searchForBug(id);
 		String currentBugInDatabaseScreenshotDirectory = currentBugInDatabase.getScreenshot();
-		String currentBugInDatabaseDocumentDirectory = currentBugInDatabase.getDocument();
+		String currentBugInDatabaseDocumentDirectory = currentBugInDatabase.getDocument();		
+		//System.out.println("ConnectToDB.updateDB(): The UpdatedBug has Screenshot directory of " + bug.getScreenshot() + ". and bug in DB has a directory " + currentBugInDatabaseScreenshotDirectory);
 		
-		System.out.println("ConnectToDB.updateDB(): The UpdatedBug has document directory of " + bug.getDocument() + ". and bug in DB has a directory " + currentBugInDatabaseDocumentDirectory);
 		
 		// Compare Updated Bug with the Bug in the Database. NOTE: I will have to check also that Bug in DB has not 'No' set. 
 		// PROBLEM: If user de-selects a file (delete a file) and selects another file then this could be an issue.
