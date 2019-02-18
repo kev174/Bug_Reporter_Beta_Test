@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,11 +46,13 @@ import com.sun.jersey.multipart.FormDataParam;
 public class BugReporterServiceImpl implements BugReporterService {
 
 	private final static Logger log = Logger.getLogger(BugReporterServiceImpl.class);
+	private final static int SESSION_DURATION = 5;
 	public List<Bug> bugList = new ArrayList<>();
 	private List<Credentials> credentials = new ArrayList<>();
 	private ConnectToDB db;
 	private Base64Coding base64;
 	private static Map<Long, DateTime> liveSessionsMap = new HashMap<Long, DateTime>();
+	private static ScheduledExecutorService executor;
 	private int scheduleSemaphore = 0;
 	
 	@POST
@@ -157,7 +160,7 @@ public class BugReporterServiceImpl implements BugReporterService {
         ResponseBuilder response = Response.ok(fileDownloadedFromS3);
         response.header("Content-Disposition", "attachment; filename=" + fileForDownload.getName()); // response.header("Content-Disposition", "attachment; filename=file_delete.png");
         
-        return null;  // This retuns null if this service failed to bring down the File form DB. Three lines of code above N/A.
+        return null;  // This returns null if this service failed to bring down the File form DB. Three lines of code above N/A.
     }
 	
 	
@@ -315,29 +318,45 @@ public class BugReporterServiceImpl implements BugReporterService {
 				passwordInDB = result.getPassword();
 				if (un.equals(usernameInDB) && pw.equals(passwordInDB)) {
 					generatedSessionId = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
-					liveSessionsMap.put(generatedSessionId, currentDate);
-					System.out.println("User exists in the Database: " + usernameInDB + ", Password: " + passwordInDB);
-					returnString = (base64.encode(generatedSessionId + ":" + currentDate));
+					liveSessionsMap.put(generatedSessionId, currentDate.plusMinutes(SESSION_DURATION - 4)); /// ****** CHANGE THIS FOR FYP
+					returnString = (base64.encode(generatedSessionId + ":" + currentDate.plusMinutes(SESSION_DURATION)));
 
-					// RUN THE SCHEDULER
-					/*if(scheduleSemaphore == 0) {
-						ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-						executor.scheduleAtFixedRate(timeRunner, 59, 59, TimeUnit.SECONDS);
+					//System.out.println("Semaphore is " + scheduleSemaphore);
+					// RUN THE SCHEDULER JUST ONCE AS EVERY TIME THIS IS RUN, IT CREATES ANOTHER SCHEDULAR
+					if(scheduleSemaphore == 0) {
+						executor = Executors.newScheduledThreadPool(1);
+						executor.scheduleAtFixedRate(checkSessionExpiryDates, 15, 15, TimeUnit.SECONDS);
 						scheduleSemaphore = 1;
-					}*/
+					}
 					
 				} else {
-					System.out.println("I DONT exist in the Database: ");
 					return Response.status(400).entity("No").build();
 				}
 			}
 		} 
 
-		DateTime currentDatePlusFive = currentDate.plusMinutes(5);
-		
-		if (currentDate.compareTo(currentDatePlusFive) < 1) {
-            System.out.println("*CurrentTimePlusFive is AFTER currentTime. So Yes, This is a Valid Session ID..");
-        }
+		// *********** This code will be moved to the Scheduler 
+		/*for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) {
+			
+			Long key = entry.getKey();
+			DateTime sessionExpiryDate = entry.getValue();
+			liveSessionsMap.put(new Long(123456789), sessionExpiryDate);
+			
+			System.out.println("Iterating through Hashmap with Key: " + key + ", DateTime Expiry Date: " + sessionExpiryDate);
+			System.out.println("CurrentDate is: " + currentDate + ", Session Expiry DateTime is " + sessionExpiryDate);
+			System.out.println("Size of HasmMap BEFORE deletion: " + liveSessionsMap.size());
+			
+			if (sessionExpiryDate.compareTo(currentDate) < 1)  {
+	            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
+	            liveSessionsMap.remove(key, sessionExpiryDate);
+	        } else if (currentDate.compareTo(sessionExpiryDate) < 1) {
+	            System.out.println("API: CurrentDate is LESS than SessionExpiryDate.");
+	        } else {
+	        	System.out.println("API: DateTimes are the SAME.");
+	        }
+					
+			System.out.println("Size of HasmMap AFTER Deletion: " + liveSessionsMap.size());
+		}*/
 		
 		return Response.ok(returnString).build();
 	}
@@ -353,12 +372,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 		}
 		
 		return false;
-		
-		/* ITERAGTE THROUGH HASHMAP
-		 * for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) { Long key =
-		 * entry.getKey(); Object value = entry.getValue();
-		 * System.out.println("Iterating through Hashmap " + key); }
-		 */
 	}
 
 	
@@ -385,21 +398,44 @@ public class BugReporterServiceImpl implements BugReporterService {
 
 		return aBug;
 	}
-
-
-	/*public List<Bug> getAllBugs() {			
-		db = new ConnectToDB();
-		bugList = db.getAllBugs();		
-		return bugList;
-	}*/
     
 		
-	public static Runnable timeRunner = new Runnable() {
+	public static Runnable checkSessionExpiryDates = new Runnable() {
 		public void run() {
-			System.out.println("I run every 5 Seconds.");
+			
+			DateTime currentDate = DateTime.now();
+			
+			if(liveSessionsMap.size() > 0) {
+				for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) {
+
+					Long key = entry.getKey();
+					DateTime sessionExpiryDate = entry.getValue();
+					//liveSessionsMap.put(new Long(123456789), sessionExpiryDate);
+
+					//System.out.println("Iterating through Hashmap with Key: " + key + ", DateTime Expiry Date: " + sessionExpiryDate);
+					//System.out.println("CurrentDate is: " + currentDate + ", Session Expiry DateTime is " + sessionExpiryDate);
+
+					if (sessionExpiryDate.compareTo(currentDate) < 1)  {
+			            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
+			            liveSessionsMap.remove(key, sessionExpiryDate);
+			        } /*else if (currentDate.compareTo(sessionExpiryDate) < 1) {
+			            System.out.println("API: CurrentDate is LESS than SessionExpiryDate.");
+			        } else {
+			        	System.out.println("API: DateTimes are the SAME.");
+			        }*/
+
+					System.out.println("Size of HasmMap AFTER Running DateTime Comparison: " + liveSessionsMap.size());
+				}
+
+				//System.out.println("I run every 15 Seconds.");
+			} /*else {
+				executor.shutdownNow();
+				//scheduleSemaphore = 0;
+			}*/
 		}
 	};
 
+	
 	public void timerDelay() {
 		try {
 			TimeUnit.SECONDS.sleep(2);
