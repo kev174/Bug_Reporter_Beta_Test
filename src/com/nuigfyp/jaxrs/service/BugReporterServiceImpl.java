@@ -53,7 +53,9 @@ public class BugReporterServiceImpl implements BugReporterService {
 	private Base64Coding base64;
 	private static Map<Long, DateTime> liveSessionsMap = new HashMap<Long, DateTime>();
 	private static ScheduledExecutorService executor;
-	private int scheduleSemaphore = 0;
+	private static int scheduleSemaphore = 0;
+	
+	
 	
 	@POST
 	@Path("/upload")
@@ -321,12 +323,11 @@ public class BugReporterServiceImpl implements BugReporterService {
 					liveSessionsMap.put(generatedSessionId, currentDate.plusMinutes(SESSION_DURATION - 4)); /// ****** CHANGE THIS FOR FYP
 					returnString = (base64.encode(generatedSessionId + ":" + currentDate.plusMinutes(SESSION_DURATION)));
 
-					//System.out.println("Semaphore is " + scheduleSemaphore);
+					System.out.println("Semaphore is " + scheduleSemaphore);
 					// RUN THE SCHEDULER JUST ONCE AS EVERY TIME THIS IS RUN, IT CREATES ANOTHER SCHEDULAR
-					if(scheduleSemaphore == 0) {
-						executor = Executors.newScheduledThreadPool(1);
-						executor.scheduleAtFixedRate(checkSessionExpiryDates, 15, 15, TimeUnit.SECONDS);
+					if(scheduleSemaphore == 0) {				
 						scheduleSemaphore = 1;
+						startSchedular();
 					}
 					
 				} else {
@@ -366,7 +367,8 @@ public class BugReporterServiceImpl implements BugReporterService {
 		base64 = new Base64Coding();
 		String decodedSid = base64.decode(sid);
 		long sessionId = Long.valueOf(decodedSid);
-		
+		System.out.println("validSessionId Is " + sessionId + ", Size of HashMap is " + liveSessionsMap.size());
+
 		if(liveSessionsMap.containsKey(sessionId)) {
 			return true;
 		}
@@ -404,37 +406,33 @@ public class BugReporterServiceImpl implements BugReporterService {
 		public void run() {
 			
 			DateTime currentDate = DateTime.now();
+			System.out.println("Schedular: Semaphore Is " + scheduleSemaphore + ", Size of HashMap is " + liveSessionsMap.size());
 			
-			if(liveSessionsMap.size() > 0) {
+			//if(liveSessionsMap.size() > 0) {
 				for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) {
 
 					Long key = entry.getKey();
 					DateTime sessionExpiryDate = entry.getValue();
-					//liveSessionsMap.put(new Long(123456789), sessionExpiryDate);
-
-					//System.out.println("Iterating through Hashmap with Key: " + key + ", DateTime Expiry Date: " + sessionExpiryDate);
-					//System.out.println("CurrentDate is: " + currentDate + ", Session Expiry DateTime is " + sessionExpiryDate);
 
 					if (sessionExpiryDate.compareTo(currentDate) < 1)  {
 			            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
 			            liveSessionsMap.remove(key, sessionExpiryDate);
-			        } /*else if (currentDate.compareTo(sessionExpiryDate) < 1) {
-			            System.out.println("API: CurrentDate is LESS than SessionExpiryDate.");
-			        } else {
-			        	System.out.println("API: DateTimes are the SAME.");
-			        }*/
-
-					System.out.println("Size of HasmMap AFTER Running DateTime Comparison: " + liveSessionsMap.size());
+			        } 
+					
+					System.out.println("Schedular: Size of HasmMap AFTER Running DateTime Comparison: " + liveSessionsMap.size());
 				}
-
-				//System.out.println("I run every 15 Seconds.");
-			} /*else {
-				executor.shutdownNow();
-				//scheduleSemaphore = 0;
-			}*/
+			//} 
 		}
 	};
 
+	
+	public void startSchedular() {
+		
+		executor = Executors.newScheduledThreadPool(1);
+		executor.scheduleAtFixedRate(checkSessionExpiryDates, 15, 15, TimeUnit.SECONDS);
+		
+	}
+	
 	
 	public void timerDelay() {
 		try {
