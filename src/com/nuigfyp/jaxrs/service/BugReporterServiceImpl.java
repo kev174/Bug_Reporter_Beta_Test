@@ -68,7 +68,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 		base64 = new Base64Coding();
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");  		
 		String decodedFileName = base64.decode(fileDetail.getFileName());		
-		//String temp = decodedFileName;
 		String[] dirs = decodedFileName.split("/+");			
 		String finalFileDirectory = dirs[0] + "/" + dtf.format(LocalDateTime.now()) + "/" + dirs[1];	
 		
@@ -78,29 +77,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 		
 		amazonS3Api as3 = new amazonS3Api();
 		as3.saveFileToS3(uploadedInputStream, finalFileDirectory);
-    	
-		// ======= THIS PART WILL NOT BE REQUIRED WHEN UPLOADING TO S3 BUCKET, AS S3 WILL CREATE THIS.
-		// ======= THIS PART SAVES A FILE OBJECT TO MY LOCAL MACHINE C://FilesSsvedOnWebServer//
-		/*try {
-			createFolderIfNotExists(PRIMARY_WEBSERVICE_DIRECTORY + dirs[0] + "/" + folderNameWithDate);
-		} catch (SecurityException se) {
-			customResponse.setStatus(false);
-			customResponse.setMessage("Can not create destination folder on server.");
-			return Response.status(404).entity("No").build();
-		}
-
-		try {
-			saveToFile(uploadedInputStream, finalFileDirectory);
-		} catch (IOException e) {
-			customResponse.setStatus(false);
-			customResponse.setMessage("Can not save file.");
-			return Response.status(404).entity("No").build();
-		}*/
-
-        /*CustomResponse res = new CustomResponse();
-        res.setStatus(true);
-        res.setMessage("File saved to " + finalFileDirectory);*/
-        // return Response.status(200).entity("Success" + uploadedFileLocation).build();
 		
         return Response.status(200).entity(finalFileDirectory).build();
     }
@@ -177,15 +153,13 @@ public class BugReporterServiceImpl implements BugReporterService {
 		CustomResponse customResponse = new CustomResponse();
 		db = new ConnectToDB();		
 		boolean createdBugEntryInDatabase = false;
-		
-		
+			
 		if (validSessionId(sid)) {
 			try {
 				createdBugEntryInDatabase = db.addEntry(bug);
 			} catch (SQLException e) {
 				e.printStackTrace();
 				log.error("General Exception at BugReporterServiceImpl.addBugReport(). " + e);
-				System.out.println("Failed to Add a Bug.");
 				customResponse.setStatus(true);
 				customResponse.setMessage("Failed to Add a Bug with reporters name: " + bug.getReporterName());
 				return Response.status(400).entity("Bad Request Error.").build();
@@ -209,7 +183,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 		int bugId = Integer.parseInt(base64.decode(id));		
 		String updateBugEntryInDatabase = "";
 		
-		System.out.println("Bug for update has screnshot named " + bug.getScreenshot());
+		//System.out.println("Bug for update has screnshot named " + bug.getScreenshot());
 		
 		if (validSessionId(sid)) {
 			try {
@@ -262,16 +236,14 @@ public class BugReporterServiceImpl implements BugReporterService {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 		String todaysDate = dtf.format(LocalDateTime.now());		
 		int bugId = Integer.parseInt(base64.decode(Id));
-			
-		System.out.println("Changed Bug Status API: ID is " + bugId);
-		
+					
 		if (validSessionId(sid)) {
 			try {
 				db.changeBugStatus(bugId, todaysDate);
 			} catch (SQLException e) {
 				e.printStackTrace();
 				log.error("General Exception at BugReporterServiceImpl.changeBugStatus(). " + e);
-				return Response.status(400).entity("Changed Status successfull: " + bugId).build();
+				return Response.status(400).entity("Changed Status successful: " + bugId).build();
 			}
 		}
 		
@@ -301,7 +273,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSessionId(@PathParam("userLoginInfo") String userLoginInfo) {
 		
-		// *********** ID contains user:Admin **************
 		base64 = new Base64Coding();
 		long leftLimit = 1L, rightLimit = 1000000000L, generatedSessionId = 0;
 		String decoded = (base64.decode(userLoginInfo));		
@@ -335,29 +306,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 				}
 			}
 		} 
-
-		// *********** This code will be moved to the Scheduler 
-		/*for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) {
-			
-			Long key = entry.getKey();
-			DateTime sessionExpiryDate = entry.getValue();
-			liveSessionsMap.put(new Long(123456789), sessionExpiryDate);
-			
-			System.out.println("Iterating through Hashmap with Key: " + key + ", DateTime Expiry Date: " + sessionExpiryDate);
-			System.out.println("CurrentDate is: " + currentDate + ", Session Expiry DateTime is " + sessionExpiryDate);
-			System.out.println("Size of HasmMap BEFORE deletion: " + liveSessionsMap.size());
-			
-			if (sessionExpiryDate.compareTo(currentDate) < 1)  {
-	            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
-	            liveSessionsMap.remove(key, sessionExpiryDate);
-	        } else if (currentDate.compareTo(sessionExpiryDate) < 1) {
-	            System.out.println("API: CurrentDate is LESS than SessionExpiryDate.");
-	        } else {
-	        	System.out.println("API: DateTimes are the SAME.");
-	        }
-					
-			System.out.println("Size of HasmMap AFTER Deletion: " + liveSessionsMap.size());
-		}*/
 		
 		return Response.ok(returnString).build();
 	}
@@ -367,7 +315,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 		base64 = new Base64Coding();
 		String decodedSid = base64.decode(sid);
 		long sessionId = Long.valueOf(decodedSid);
-		System.out.println("validSessionId Is " + sessionId + ", Size of HashMap is " + liveSessionsMap.size());
+		System.out.println("Working SessionId Is " + sessionId + ", Size of HashMap is " + liveSessionsMap.size());
 
 		if(liveSessionsMap.containsKey(sessionId)) {
 			return true;
@@ -405,23 +353,44 @@ public class BugReporterServiceImpl implements BugReporterService {
 	public static Runnable checkSessionExpiryDates = new Runnable() {
 		public void run() {
 			
-			DateTime currentDate = DateTime.now();
-			System.out.println("Schedular: Semaphore Is " + scheduleSemaphore + ", Size of HashMap is " + liveSessionsMap.size());
-			
-			//if(liveSessionsMap.size() > 0) {
-				for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) {
+			try {
+				
+				DateTime currentDate = DateTime.now();
+				//System.out.println("Schedular: Semaphore Is " + scheduleSemaphore + ", Size of HashMap is " + liveSessionsMap.size());
+				
+				if(liveSessionsMap.size() > 0) {
+					for (Long key : liveSessionsMap.keySet()) {
 
-					Long key = entry.getKey();
-					DateTime sessionExpiryDate = entry.getValue();
+						//Long keys = get(key);
+						DateTime sessionExpiryDate = liveSessionsMap.get(key);
 
-					if (sessionExpiryDate.compareTo(currentDate) < 1)  {
-			            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
-			            liveSessionsMap.remove(key, sessionExpiryDate);
-			        } 
-					
-					System.out.println("Schedular: Size of HasmMap AFTER Running DateTime Comparison: " + liveSessionsMap.size());
+						if (sessionExpiryDate.compareTo(currentDate) < 1)  {
+				            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
+				            liveSessionsMap.remove(key, sessionExpiryDate);
+				        } 				
+					}
 				}
-			//} 
+				
+				/*if(liveSessionsMap.size() > 0) {
+					for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) {
+
+						Long key = entry.getKey();
+						DateTime sessionExpiryDate = entry.getValue();
+
+						if (sessionExpiryDate.compareTo(currentDate) < 1)  {
+				            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
+				            liveSessionsMap.remove(key, sessionExpiryDate);
+				        } 				
+					}
+				}*/
+				
+				System.out.println("Schedular: Semaphore Is " + scheduleSemaphore + ", Size of HashMap is " + liveSessionsMap.size());
+				
+			} catch (Exception e) {
+				// Remove PrintStackTrace and will work
+				// e.printStackTrace();
+			}
+			
 		}
 	};
 

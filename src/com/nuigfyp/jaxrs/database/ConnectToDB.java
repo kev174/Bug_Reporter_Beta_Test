@@ -101,10 +101,12 @@ public class ConnectToDB implements ConnectToDBInter {
 		System.out.println("deleteBugAndFiles(): Document ABSOLUTE PATH directory is " + documentFileDirectory.getAbsolutePath() + ", with bugDocument() = " + bug.getDocument());
 		
 		if(!bug.getScreenshot().equals("No")) {
-			System.out.println(deleteFileIfExists(bug.getScreenshot())); ;
+			//System.out.println(deleteFileIfExists(bug.getScreenshot()));
+			deleteFileIfExists(bug.getScreenshot());
 		}
 		if(!bug.getDocument().equals("No")) {
-			System.out.println(deleteFileIfExists(bug.getDocument()));
+			//System.out.println(deleteFileIfExists(bug.getDocument()));
+			deleteFileIfExists(bug.getDocument());
 		}
 		
 
