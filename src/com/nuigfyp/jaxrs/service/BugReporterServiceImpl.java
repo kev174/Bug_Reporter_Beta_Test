@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+//import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nuigfyp.jaxrs.model.CustomResponse;
+//import com.nuigfyp.jaxrs.model.CustomResponse;
 //import com.nuigfyp.model.Base64Coding;
 import com.nuigfyp.jaxrs.database.ConnectToDB;
 import com.nuigfyp.jaxrs.model.Bug;
@@ -150,7 +150,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 		// -----------------------------------------------------------------------------------------------------------------------
 		// Change from customResponse to Response like '/upload' above. customResponse is good when looking for reply from POSTMAN
 		// -----------------------------------------------------------------------------------------------------------------------
-		CustomResponse customResponse = new CustomResponse();
+		//CustomResponse customResponse = new CustomResponse();
 		db = new ConnectToDB();		
 		boolean createdBugEntryInDatabase = false;
 			
@@ -160,8 +160,8 @@ public class BugReporterServiceImpl implements BugReporterService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 				log.error("General Exception at BugReporterServiceImpl.addBugReport(). " + e);
-				customResponse.setStatus(true);
-				customResponse.setMessage("Failed to Add a Bug with reporters name: " + bug.getReporterName());
+				//customResponse.setStatus(true);
+				//customResponse.setMessage("Failed to Add a Bug with reporters name: " + bug.getReporterName());
 				return Response.status(400).entity("Bad Request Error.").build();
 			}
 		}
@@ -269,6 +269,31 @@ public class BugReporterServiceImpl implements BugReporterService {
 	
 	
 	@GET
+	@Path("/{id}/getSpecificBug")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Bug getSpecificBug(@PathParam("id") String id) {
+		
+		base64 = new Base64Coding();			
+		int bugId = Integer.parseInt(base64.decode(id));
+		
+		Bug bug = new Bug();		
+		db = new ConnectToDB();	
+		bug = db.searchForBug(bugId);
+						
+		//---------------------------------------------------------
+		// imported GSON in this class and also in the POM.xml file
+		// These libraries convert a Bug to Json and back again.
+		//---------------------------------------------------------
+		Gson gsonBuilder = new GsonBuilder().create();
+		String jsonFromBugPojo = gsonBuilder.toJson(bug);
+		Gson gson = new Gson();
+		Bug aBug = gson.fromJson(jsonFromBugPojo, Bug.class); 
+
+		return aBug;
+	}
+    
+	
+	@GET
 	@Path("/getSessionId/{userLoginInfo}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSessionId(@PathParam("userLoginInfo") String userLoginInfo) {
@@ -294,7 +319,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 					liveSessionsMap.put(generatedSessionId, currentDate.plusMinutes(SESSION_DURATION - 4)); /// ****** CHANGE THIS FOR FYP
 					returnString = (base64.encode(generatedSessionId + ":" + currentDate.plusMinutes(SESSION_DURATION)));
 
-					System.out.println("Semaphore is " + scheduleSemaphore);
+					//System.out.println("Semaphore is " + scheduleSemaphore);
 					// RUN THE SCHEDULER JUST ONCE AS EVERY TIME THIS IS RUN, IT CREATES ANOTHER SCHEDULAR
 					if(scheduleSemaphore == 0) {				
 						scheduleSemaphore = 1;
@@ -324,31 +349,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 		return false;
 	}
 
-	
-	@GET
-	@Path("/{id}/getSpecificBug")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Bug getSpecificBug(@PathParam("id") String id) {
-		
-		base64 = new Base64Coding();			
-		int bugId = Integer.parseInt(base64.decode(id));
-		
-		Bug bug = new Bug();		
-		db = new ConnectToDB();	
-		bug = db.searchForBug(bugId);
-						
-		//---------------------------------------------------------
-		// imported GSON in this class and also in the POM.xml file
-		// These libraries convert a Bug to Json and back again.
-		//---------------------------------------------------------
-		Gson gsonBuilder = new GsonBuilder().create();
-		String jsonFromBugPojo = gsonBuilder.toJson(bug);
-		Gson gson = new Gson();
-		Bug aBug = gson.fromJson(jsonFromBugPojo, Bug.class); 
-
-		return aBug;
-	}
-    
 		
 	public static Runnable checkSessionExpiryDates = new Runnable() {
 		public void run() {
@@ -356,41 +356,25 @@ public class BugReporterServiceImpl implements BugReporterService {
 			try {
 				
 				DateTime currentDate = DateTime.now();
-				//System.out.println("Schedular: Semaphore Is " + scheduleSemaphore + ", Size of HashMap is " + liveSessionsMap.size());
 				
 				if(liveSessionsMap.size() > 0) {
 					for (Long key : liveSessionsMap.keySet()) {
 
-						//Long keys = get(key);
 						DateTime sessionExpiryDate = liveSessionsMap.get(key);
 
 						if (sessionExpiryDate.compareTo(currentDate) < 1)  {
-				            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
+				            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS WILL BE REMOVED FROM THE HASHMAP.");
 				            liveSessionsMap.remove(key, sessionExpiryDate);
 				        } 				
 					}
 				}
 				
-				/*if(liveSessionsMap.size() > 0) {
-					for (Entry<Long, DateTime> entry : liveSessionsMap.entrySet()) {
-
-						Long key = entry.getKey();
-						DateTime sessionExpiryDate = entry.getValue();
-
-						if (sessionExpiryDate.compareTo(currentDate) < 1)  {
-				            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS NEEDS TO REMOVE FROM HASHMAP.");
-				            liveSessionsMap.remove(key, sessionExpiryDate);
-				        } 				
-					}
-				}*/
-				
-				System.out.println("Schedular: Semaphore Is " + scheduleSemaphore + ", Size of HashMap is " + liveSessionsMap.size());
+				System.out.println("Size of HashMap is " + liveSessionsMap.size());
 				
 			} catch (Exception e) {
 				// Remove PrintStackTrace and will work
 				// e.printStackTrace();
-			}
-			
+			}			
 		}
 	};
 
@@ -403,11 +387,11 @@ public class BugReporterServiceImpl implements BugReporterService {
 	}
 	
 	
-	public void timerDelay() {
+	/*public void timerDelay() {
 		try {
 			TimeUnit.SECONDS.sleep(2);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-	}
+	}*/
 }

@@ -117,8 +117,8 @@ public class amazonS3Api {
 		AmazonS3 s3 = setCredentials();
 
 		// https://stackoverflow.com/questions/45994046/upload-pdf-or-image-file-to-aws-bucket-java
-		System.out.println("Amazon saveFileToS3() is running... adding file " + file.getName() + " to the Bucket: " + BUCKETNAME
-				+ ", and will be called " + finalFileDirectory + " when in the database.");
+		/*System.out.println("Amazon saveFileToS3() is running... adding file " + file.getName() + " to the Bucket: " + BUCKETNAME
+				+ ", and will be called " + finalFileDirectory + " when in the database.");*/
 
 		try {
 
@@ -144,6 +144,7 @@ public class amazonS3Api {
 
 		AWSCredentials credentials = new BasicAWSCredentials(appId, appSecret);
 		AmazonS3 s3 = new AmazonS3Client(credentials);
+		return s3;
 		
 		/*AWSCredentials credentials = null;
 
@@ -164,15 +165,15 @@ public class amazonS3Api {
 		 * AmazonS3ClientBuilder.standard() .withCredentials(new
 		 * AWSStaticCredentialsProvider(credentials)) .withRegion("eu-west-1") .build();
 		 */
-		return s3;
+		
 	}
 
 
-	public static void timerDelay() {
+	/*public static void timerDelay() {
 		try {
 			TimeUnit.SECONDS.sleep(3);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-	}
+	}*/
 }

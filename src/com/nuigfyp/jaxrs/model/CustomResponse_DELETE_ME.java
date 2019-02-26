@@ -3,7 +3,7 @@ package com.nuigfyp.jaxrs.model;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class CustomResponse {
+public class CustomResponse_DELETE_ME {
 
 	private boolean status;
 	private String message;

@@ -98,7 +98,7 @@ public class ConnectToDB implements ConnectToDBInter {
 		//File screenshotFileDirectory = new File(bug.getScreenshot());
 		File documentFileDirectory = new File(bug.getDocument());	
 						
-		System.out.println("deleteBugAndFiles(): Document ABSOLUTE PATH directory is " + documentFileDirectory.getAbsolutePath() + ", with bugDocument() = " + bug.getDocument());
+		//System.out.println("deleteBugAndFiles(): Document ABSOLUTE PATH directory is " + documentFileDirectory.getAbsolutePath() + ", with bugDocument() = " + bug.getDocument());
 		
 		if(!bug.getScreenshot().equals("No")) {
 			//System.out.println(deleteFileIfExists(bug.getScreenshot()));
@@ -163,9 +163,7 @@ public class ConnectToDB implements ConnectToDBInter {
 		Bug currentBugInDatabase = new Bug();
 		currentBugInDatabase = searchForBug(id);
 		String currentBugInDatabaseScreenshotDirectory = currentBugInDatabase.getScreenshot();
-		String currentBugInDatabaseDocumentDirectory = currentBugInDatabase.getDocument();		
-		//System.out.println("ConnectToDB.updateDB(): The UpdatedBug has Screenshot directory of " + bug.getScreenshot() + ". and bug in DB has a directory " + currentBugInDatabaseScreenshotDirectory);
-		
+		String currentBugInDatabaseDocumentDirectory = currentBugInDatabase.getDocument();				
 		
 		// Compare Updated Bug with the Bug in the Database. NOTE: I will have to check also that Bug in DB has not 'No' set. 
 		// PROBLEM: If user de-selects a file (delete a file) and selects another file then this could be an issue.
@@ -173,12 +171,14 @@ public class ConnectToDB implements ConnectToDBInter {
 		// to delete previous file in the DB. 
 		// TESTING: With old Bug in DB set to 'No' and you update with new file, This DOES launch @DELETE - amazonS3API.deleteFileFromS3 	
 		if((!bug.getScreenshot().equals(currentBugInDatabaseScreenshotDirectory))) {
-			System.out.println("The Bug to be updated has a different Screenshot Directory from the Bug currently in the database. Going to delete this file " + currentBugInDatabaseScreenshotDirectory);
-			System.out.println(deleteFileIfExists(currentBugInDatabaseScreenshotDirectory));
+			//System.out.println("The Bug to be updated has a different Screenshot Directory from the Bug currently in the database. Going to delete this file " + currentBugInDatabaseScreenshotDirectory);
+			deleteFileIfExists(currentBugInDatabaseScreenshotDirectory);
+			//System.out.println(deleteFileIfExists(currentBugInDatabaseScreenshotDirectory));
 		}
 		if((!bug.getDocument().equals(currentBugInDatabaseDocumentDirectory))) {
-			System.out.println("The Bug to be updated has a different Document Directory from the Bug currently in the database. Going to delete this file " + currentBugInDatabaseDocumentDirectory);
-			System.out.println(deleteFileIfExists(currentBugInDatabaseDocumentDirectory));
+			//System.out.println("The Bug to be updated has a different Document Directory from the Bug currently in the database. Going to delete this file " + currentBugInDatabaseDocumentDirectory);
+			deleteFileIfExists(currentBugInDatabaseDocumentDirectory);
+			//System.out.println(deleteFileIfExists(currentBugInDatabaseDocumentDirectory));
 		}
 
 		
@@ -247,7 +247,7 @@ public class ConnectToDB implements ConnectToDBInter {
 			}
 
 		} catch (NumberFormatException e) {
-			System.out.println(e);
+			//System.out.println(e);
 			log.error("NumberFormatException at ConnectToDB.searchForBug(). " + e);
 		}
 
@@ -366,7 +366,7 @@ public class ConnectToDB implements ConnectToDBInter {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Failure to getAllBugs in ConnectToDB.getAllBugs().");
+			//System.out.println("Failure to getAllBugs in ConnectToDB.getAllBugs().");
         	JOptionPane.showMessageDialog(null, "getAllBugs(): Get all bugs exception. ", "General Exception.", JOptionPane.INFORMATION_MESSAGE);
         	log.error("Exception at ConnectToDB.getAllBugs(). " + e);
         	// When this occurs the Ajax keeps rotating and users can't access the app. return a null value and from BugReporterServiceImpl 
@@ -402,7 +402,7 @@ public class ConnectToDB implements ConnectToDBInter {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Failure in ConnectToDB.getAllUsersCredentials().");
+			//System.out.println("Failure in ConnectToDB.getAllUsersCredentials().");
         	JOptionPane.showMessageDialog(null, "getAllUsersCredentials(): getAllUsersCredentials exception. ", "General Exception.", JOptionPane.INFORMATION_MESSAGE);
         	log.error("Exception at ConnectToDB.getAllUsersCredentials(). " + e);
         	// When this occurs the Ajax keeps rotating and users can't access the app. return a null value and from BugReporterServiceImpl 
@@ -461,6 +461,7 @@ public class ConnectToDB implements ConnectToDBInter {
 
 		boolean fileExist = amazonS3Api.deleteFileFromS3(s3DeleteThisFile);
 		
+		// This could probably be deleted
 		if(fileExist) {
 			return ("Successfull in deleteing file " + s3DeleteThisFile);
 		} else {
@@ -475,22 +476,20 @@ public class ConnectToDB implements ConnectToDBInter {
 		
 		if(file.isDirectory()){		
 			if(file.list().length < 1){				
-				System.out.println("Directory is empty!. going to delete this directory.");	
+				//System.out.println("Directory is empty!. going to delete this directory.");	
 				file.delete();
-			}else{					
-				System.out.println("Directory is not empty!. Size is " + file.list().length + ". Will not delete this directory.");					
+			} else {					
+				//System.out.println("Directory is not empty!. Size is " + file.list().length + ". Will not delete this directory.");					
 			}				
-		} else {				
-			System.out.println("This is not a directory");	// N/A???		
-		}
+		} 
 	}
 	
 	
-	public static void timerDelay() {
+	/*public static void timerDelay() {
 		try {
 			TimeUnit.SECONDS.sleep(3);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-	}
+	}*/
 }
