@@ -18,6 +18,7 @@ public class Credentials {
 		this.role = role;
 	}
 	
+	
 	public int getId() {
 		return id;
 	}

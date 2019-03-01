@@ -6,7 +6,7 @@ public class Base64Coding {
 
 	public String encode(String stringToBeEncoded) {
 
-		String encoded = DatatypeConverter.printBase64Binary(stringToBeEncoded.getBytes()); // No = Tm8=
+		String encoded = DatatypeConverter.printBase64Binary(stringToBeEncoded.getBytes()); 
 		return encoded;
 	}
 

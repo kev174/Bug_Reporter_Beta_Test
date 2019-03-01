@@ -39,8 +39,7 @@ import org.joda.time.DateTime;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 
-// Spend some time to familiarize yourself with JAX-RS annotations @Path, @PathParam, @POST, @GET, @Consumes and @Produces.
-// String Bucket__Name = "bug-reporter-bucket-" + UUID.randomUUID();
+
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/bugs")
 public class BugReporterServiceImpl implements BugReporterService {
@@ -120,25 +119,19 @@ public class BugReporterServiceImpl implements BugReporterService {
 				fileDownloadedFromS3 = amazonS3Api.getFileFromS3(fileDir);
 				File fileForDownload = new File(fileDir); 
 		        ResponseBuilder response = Response.ok(fileDownloadedFromS3);
-		        response.header("Content-Disposition", "attachment; filename=" + fileForDownload.getName()); // response.header("Content-Disposition", "attachment; filename=file_delete.png");
+		        response.header("Content-Disposition", "attachment; filename=" + fileForDownload.getName()); 
 		        return response.build();
 				
 			} catch (Exception e) {
-				// ---- if returned File is null, then a null pointer exception is caught----
-				System.out.println("BugReprterServiceImpl.getFileNamed() Failed to bring File from Amazon S3 Database." + e);
 				log.error("General Exception at BugReporterServiceImpl.downloadFile(). " + e);
 			}
 		}
-		
-		// ========================================================================================================================
-		// This Works when downloading from my local machine i.e. "C:/FilesSavedOnWebServer/NUIG/2018-08-18/07-47-05-msft_word.png" 
-		// AWS S3 testing will require the file to exist in its database now and will throw an Exception
-		// ========================================================================================================================
-		File fileForDownload = new File(fileDir); // if file does not exist in DB then this will throw exception also
+	
+		File fileForDownload = new File(fileDir); 
         ResponseBuilder response = Response.ok(fileDownloadedFromS3);
-        response.header("Content-Disposition", "attachment; filename=" + fileForDownload.getName()); // response.header("Content-Disposition", "attachment; filename=file_delete.png");
+        response.header("Content-Disposition", "attachment; filename=" + fileForDownload.getName()); 
         
-        return null;  // This returns null if this service failed to bring down the File form DB. Three lines of code above N/A.
+        return null;  
     }
 	
 	
@@ -147,10 +140,6 @@ public class BugReporterServiceImpl implements BugReporterService {
     @Path("/addBug/{sid}")
 	public Response addBugReport(@PathParam("sid") String sid, Bug bug) { 
 	
-		// -----------------------------------------------------------------------------------------------------------------------
-		// Change from customResponse to Response like '/upload' above. customResponse is good when looking for reply from POSTMAN
-		// -----------------------------------------------------------------------------------------------------------------------
-		//CustomResponse customResponse = new CustomResponse();
 		db = new ConnectToDB();		
 		boolean createdBugEntryInDatabase = false;
 			
@@ -158,10 +147,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 			try {
 				createdBugEntryInDatabase = db.addEntry(bug);
 			} catch (SQLException e) {
-				e.printStackTrace();
 				log.error("General Exception at BugReporterServiceImpl.addBugReport(). " + e);
-				//customResponse.setStatus(true);
-				//customResponse.setMessage("Failed to Add a Bug with reporters name: " + bug.getReporterName());
 				return Response.status(400).entity("Bad Request Error.").build();
 			}
 		}
@@ -182,14 +168,11 @@ public class BugReporterServiceImpl implements BugReporterService {
 		base64 = new Base64Coding();				
 		int bugId = Integer.parseInt(base64.decode(id));		
 		String updateBugEntryInDatabase = "";
-		
-		//System.out.println("Bug for update has screnshot named " + bug.getScreenshot());
-		
+				
 		if (validSessionId(sid)) {
 			try {
 				updateBugEntryInDatabase = db.updateDB(bug, bugId);
 			} catch (SQLException e) {
-				e.printStackTrace();
 				log.error("General Exception at BugReporterServiceImpl.updateBug(). " + e);
 				return Response.status(400).entity("Failed to Add a Bug with reporters name: " + bug.getReporterName())
 						.build();
@@ -202,7 +185,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 	
 	@Override
 	@DELETE
-    @Path("/deletebug/{bugid}/{sid}") // @Consumes(MediaType.APPLICATION_JSON) // not required as is in the header above
+    @Path("/deletebug/{bugid}/{sid}") 
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteBug(@PathParam("bugid") String Id, @PathParam("sid") String sid) {
 			
@@ -214,7 +197,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 			try {
 				db.deleteBugAndFiles(bugId);
 			} catch (SQLException e) {
-				e.printStackTrace();
 				log.error("General Exception at BugReporterServiceImpl.deleteBug(). " + e);
 
 				return Response.status(400).entity("400").build();
@@ -241,7 +223,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 			try {
 				db.changeBugStatus(bugId, todaysDate);
 			} catch (SQLException e) {
-				e.printStackTrace();
 				log.error("General Exception at BugReporterServiceImpl.changeBugStatus(). " + e);
 				return Response.status(400).entity("Changed Status successful: " + bugId).build();
 			}
@@ -252,7 +233,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 	
 	
 	@Override
-	@RolesAllowed("ADMIN")
 	@GET
 	@Path("/getAll/{sid}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -279,11 +259,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 		Bug bug = new Bug();		
 		db = new ConnectToDB();	
 		bug = db.searchForBug(bugId);
-						
-		//---------------------------------------------------------
-		// imported GSON in this class and also in the POM.xml file
-		// These libraries convert a Bug to Json and back again.
-		//---------------------------------------------------------
+
 		Gson gsonBuilder = new GsonBuilder().create();
 		String jsonFromBugPojo = gsonBuilder.toJson(bug);
 		Gson gson = new Gson();
@@ -340,7 +316,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 		base64 = new Base64Coding();
 		String decodedSid = base64.decode(sid);
 		long sessionId = Long.valueOf(decodedSid);
-		System.out.println("Working SessionId Is " + sessionId + ", Size of HashMap is " + liveSessionsMap.size());
 
 		if(liveSessionsMap.containsKey(sessionId)) {
 			return true;
@@ -372,8 +347,6 @@ public class BugReporterServiceImpl implements BugReporterService {
 				System.out.println("Size of HashMap is " + liveSessionsMap.size());
 				
 			} catch (Exception e) {
-				// Remove PrintStackTrace and will work
-				// e.printStackTrace();
 			}			
 		}
 	};
@@ -386,12 +359,4 @@ public class BugReporterServiceImpl implements BugReporterService {
 		
 	}
 	
-	
-	/*public void timerDelay() {
-		try {
-			TimeUnit.SECONDS.sleep(2);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-	}*/
 }

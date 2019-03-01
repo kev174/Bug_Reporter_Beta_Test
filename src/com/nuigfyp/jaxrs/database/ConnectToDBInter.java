@@ -17,4 +17,5 @@ public interface ConnectToDBInter {
 	public List<Credentials> getAllUsersCredentials();
 	public String deleteFileIfExists(String s3DeleteThisFile);
 	public void deleteDirectroyIfEmpty(String fileDirectory);
+	
 }

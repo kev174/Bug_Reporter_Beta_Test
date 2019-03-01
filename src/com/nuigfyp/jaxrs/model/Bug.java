@@ -11,14 +11,13 @@ public class Bug implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int id, severity, project, active, bugClassification;
 	private String reporterName, testerName, description, screenshot, document, startDate, endDate;
-	// boolean active;
 
 	public Bug() {
 	}
 
 	public Bug(int id, String reporterName, String testerName, String description, int severity, int project,
-			String screenshot, String document, String startDate, String endDate, int active,
-			int bugClassification) {
+			String screenshot, String document, String startDate, String endDate, int active, int bugClassification) {
+		
 		super();
 		this.id = id;
 		this.severity = severity;
@@ -32,6 +31,7 @@ public class Bug implements Serializable {
 		this.endDate = endDate;
 		this.active = active;
 		this.bugClassification = bugClassification;
+		
 	}
 
 	public int getId() {
