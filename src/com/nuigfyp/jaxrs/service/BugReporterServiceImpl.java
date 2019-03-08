@@ -8,12 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-//import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -25,17 +22,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-//import com.nuigfyp.jaxrs.model.CustomResponse;
-//import com.nuigfyp.model.Base64Coding;
 import com.nuigfyp.jaxrs.database.ConnectToDB;
 import com.nuigfyp.jaxrs.model.Bug;
 import com.nuigfyp.jaxrs.model.Credentials;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
-
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 
@@ -277,38 +270,44 @@ public class BugReporterServiceImpl implements BugReporterService {
 		base64 = new Base64Coding();
 		long leftLimit = 1L, rightLimit = 1000000000L, generatedSessionId = 0;
 		String decoded = (base64.decode(userLoginInfo));		
-		String[] data = decoded.split(":", 2);
-		String un = data[0], pw = data[1]; 
+		String[] data = decoded.split(":", 3);
+		String un = data[0], pw = data[1], user = data[2]; 
 		String returnString = "";
 		DateTime currentDate = DateTime.now();
 		
-		String usernameInDB = "", passwordInDB = "";	
+		String usernameInDB = "", passwordInDB = "", userInDB = "";	
 		db = new ConnectToDB();		
 		credentials = db.getAllUsersCredentials();
 
+		//System.out.println("Username sent: " + user + ", Size of Credentials is: " + credentials.size());
+		
 		if (credentials.size() > 0) {
 			for (Credentials result : credentials) {
 				usernameInDB = result.getUsername();
 				passwordInDB = result.getPassword();
-				if (un.equals(usernameInDB) && pw.equals(passwordInDB)) {
+				userInDB = result.getFullname();
+				//System.out.println("Username in DB: " + userInDB);
+				
+				if (un.equals(usernameInDB) && pw.equals(passwordInDB) && user.equals(userInDB)) {
 					generatedSessionId = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
 					liveSessionsMap.put(generatedSessionId, currentDate.plusMinutes(SESSION_DURATION - 4)); /// ****** CHANGE THIS FOR FYP
 					returnString = (base64.encode(generatedSessionId + ":" + currentDate.plusMinutes(SESSION_DURATION)));
 
-					//System.out.println("Semaphore is " + scheduleSemaphore);
-					// RUN THE SCHEDULER JUST ONCE AS EVERY TIME THIS IS RUN, IT CREATES ANOTHER SCHEDULAR
 					if(scheduleSemaphore == 0) {				
 						scheduleSemaphore = 1;
 						startSchedular();
 					}
 					
-				} else {
+					return Response.ok(returnString).build();
+					
+				} /*else {
 					return Response.status(400).entity("No").build();
-				}
+				}*/
 			}
 		} 
 		
-		return Response.ok(returnString).build();
+		//return Response.ok(returnString).build();
+		return Response.status(400).entity("No").build();
 	}
 	
 	public boolean validSessionId(String sid) {

@@ -1,181 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.2.3" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
-  <class id="1" language="java" name="com.nuigfyp.jaxrs.model.CustomResponse_DELETE_ME" 
-    project="Bug_Reporter_Rest_Amazon_Aws" 
-    file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/model/CustomResponse_DELETE_ME.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="189" width="144" x="323" y="-1"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="2" language="java" name="com.nuigfyp.jaxrs.service.BugReporterServiceImpl" 
+  <class id="1" language="java" name="com.nuigfyp.jaxrs.service.BugReporterServiceImpl" 
     project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/service/BugReporterServiceImpl.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="405" width="288" x="957" y="-1"/>    
+    <position height="-1" width="-1" x="676" y="162"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="3" language="java" name="com.nuigfyp.jaxrs.model.Bug" project="Bug_Reporter_Rest_Amazon_Aws" 
+  <class id="2" language="java" name="com.nuigfyp.jaxrs.model.Bug" project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/model/Bug.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="765" width="337" x="978" y="853"/>    
+    <position height="-1" width="-1" x="1120" y="728"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="4" language="java" name="com.nuigfyp.jaxrs.service.amazonS3Api" project="Bug_Reporter_Rest_Amazon_Aws" 
+  <class id="3" language="java" name="com.nuigfyp.jaxrs.service.amazonS3Api" project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/service/amazonS3Api.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="225" width="185" x="620" y="-1"/>    
+    <position height="-1" width="-1" x="299" y="68"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="5" language="java" name="com.nuigfyp.jaxrs.database.ConnectToDBInter" 
+  <interface id="4" language="java" name="com.nuigfyp.jaxrs.database.ConnectToDBInter" 
     project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/database/ConnectToDBInter.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="153" width="193" x="482" y="853"/>    
+    <position height="-1" width="-1" x="676" y="874"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="6" language="java" name="com.nuigfyp.jaxrs.model.Credentials" project="Bug_Reporter_Rest_Amazon_Aws" 
+  <class id="5" language="java" name="com.nuigfyp.jaxrs.model.Credentials" project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/model/Credentials.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="351" width="223" x="715" y="853"/>    
+    <position height="-1" width="-1" x="1118" y="163"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="7" language="java" name="com.nuigfyp.jaxrs.service.Base64Coding" project="Bug_Reporter_Rest_Amazon_Aws" 
+  <class id="6" language="java" name="com.nuigfyp.jaxrs.service.Base64Coding" project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/service/Base64Coding.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="117" width="129" x="209" y="444"/>    
+    <position height="-1" width="-1" x="271" y="244"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="8" language="java" name="com.nuigfyp.jaxrs.service.BugReporterService" 
+  <interface id="7" language="java" name="com.nuigfyp.jaxrs.service.BugReporterService" 
     project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/service/BugReporterService.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="207" width="288" x="378" y="444"/>    
+    <position height="-1" width="-1" x="346" y="445"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="9" language="java" name="com.nuigfyp.jaxrs.database.ConnectToDB" project="Bug_Reporter_Rest_Amazon_Aws" 
+  <class id="8" language="java" name="com.nuigfyp.jaxrs.database.ConnectToDB" project="Bug_Reporter_Rest_Amazon_Aws" 
     file="/Bug_Reporter_Rest_Amazon_Aws/src/com/nuigfyp/jaxrs/database/ConnectToDB.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="369" width="230" x="706" y="444"/>    
+    <position height="-1" width="-1" x="673" y="553"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <realization id="10">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="8"/>  
-  </realization>  
-  <association id="11">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="12" name="base64">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="13" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <association id="9">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="10" name="credentials"/>      
+      <multiplicity id="11" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="7" navigable="true"/>    
+    <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="14">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="15" name="db">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="16" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <association id="12">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="13" name="db"/>      
+      <multiplicity id="14" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="9" navigable="true"/>    
+    <end type="TARGET" refId="8" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="17">    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="18" name="credentials">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="19" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <association id="15">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="16" name="credentials"/>      
+      <multiplicity id="17" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="6" navigable="true"/>    
+    <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="20">    
-    <bendpoint x="987" y="444"/>    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="21" name="bugList">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="22" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <association id="18">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="19" name="bugList"/>      
+      <multiplicity id="20" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="23">    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="24" name="bugList">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="25" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
-    </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="26">    
-    <end type="SOURCE" refId="9"/>    
-    <end type="TARGET" refId="5"/>  
-  </realization>  
-  <association id="27">    
-    <bendpoint x="966" y="444"/>    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="28" name="credentials">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="29" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <association id="21">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="22" name="base64"/>      
+      <multiplicity id="23" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="6" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <realization id="24">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="7"/>  
+  </realization>  
+  <association id="25">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="26" name="bugList"/>      
+      <multiplicity id="27" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="28">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     sort-features="false" accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    
