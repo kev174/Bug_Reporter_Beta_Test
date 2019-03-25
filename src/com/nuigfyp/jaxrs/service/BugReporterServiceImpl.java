@@ -128,7 +128,7 @@ public class BugReporterServiceImpl implements BugReporterService {
     }
 	
 	
-	@Override // THIS MEANS THAT THE INTERFACE MUST CONTAIN THIS METHOD
+	@Override 
 	@POST
     @Path("/addBug/{sid}")
 	public Response addBugReport(@PathParam("sid") String sid, Bug bug) { 
@@ -278,19 +278,16 @@ public class BugReporterServiceImpl implements BugReporterService {
 		String usernameInDB = "", passwordInDB = "", userInDB = "";	
 		db = new ConnectToDB();		
 		credentials = db.getAllUsersCredentials();
-
-		//System.out.println("Username sent: " + user + ", Size of Credentials is: " + credentials.size());
 		
 		if (credentials.size() > 0) {
 			for (Credentials result : credentials) {
 				usernameInDB = result.getUsername();
 				passwordInDB = result.getPassword();
 				userInDB = result.getFullname();
-				//System.out.println("Username in DB: " + userInDB);
 				
 				if (un.equals(usernameInDB) && pw.equals(passwordInDB) && user.equals(userInDB)) {
 					generatedSessionId = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
-					liveSessionsMap.put(generatedSessionId, currentDate.plusMinutes(SESSION_DURATION - 4)); /// ****** CHANGE THIS FOR FYP
+					liveSessionsMap.put(generatedSessionId, currentDate.plusMinutes(SESSION_DURATION - 4)); // ****** CHANGE THIS FOR FYP
 					returnString = (base64.encode(generatedSessionId + ":" + currentDate.plusMinutes(SESSION_DURATION)));
 
 					if(scheduleSemaphore == 0) {				
@@ -300,13 +297,10 @@ public class BugReporterServiceImpl implements BugReporterService {
 					
 					return Response.ok(returnString).build();
 					
-				} /*else {
-					return Response.status(400).entity("No").build();
-				}*/
+				} 
 			}
 		} 
 		
-		//return Response.ok(returnString).build();
 		return Response.status(400).entity("No").build();
 	}
 	
