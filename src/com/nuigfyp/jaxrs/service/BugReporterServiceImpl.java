@@ -120,6 +120,7 @@ public class BugReporterServiceImpl implements BugReporterService {
 			}
 		}
 	
+		// I dont believe this is required here
 		File fileForDownload = new File(fileDir); 
         ResponseBuilder response = Response.ok(fileDownloadedFromS3);
         response.header("Content-Disposition", "attachment; filename=" + fileForDownload.getName()); 
@@ -253,12 +254,12 @@ public class BugReporterServiceImpl implements BugReporterService {
 		db = new ConnectToDB();	
 		bug = db.searchForBug(bugId);
 
-		Gson gsonBuilder = new GsonBuilder().create();
-		String jsonFromBugPojo = gsonBuilder.toJson(bug);
+		/*Gson gsonBuilder = new GsonBuilder().create();
 		Gson gson = new Gson();
-		Bug aBug = gson.fromJson(jsonFromBugPojo, Bug.class); 
+		String bugPojoConvertedToJson = gsonBuilder.toJson(bug);
+		Bug aBug = gson.fromJson(bugPojoConvertedToJson, Bug.class);*/ 
 
-		return aBug;
+		return bug;
 	}
     
 	
