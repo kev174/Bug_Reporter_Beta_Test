@@ -48,6 +48,17 @@ public class BugReporterServiceImpl implements BugReporterService {
 	private static int scheduleSemaphore = 0;
 	
 	
+	// @Override
+	@GET
+	@Path("/testAPI")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllBugsInDBB() {
+
+		return Response.ok("Test API on server is OK.").build();
+	
+	}
+	
+	
 	
 	@POST
 	@Path("/upload")
@@ -332,13 +343,13 @@ public class BugReporterServiceImpl implements BugReporterService {
 						DateTime sessionExpiryDate = liveSessionsMap.get(key);
 
 						if (sessionExpiryDate.compareTo(currentDate) < 1)  {
-				            System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS WILL BE REMOVED FROM THE HASHMAP.");
+				            //System.out.println("API: CurrentDate is GREATER than SessionExpiryDate. THIS WILL BE REMOVED FROM THE HASHMAP.");
 				            liveSessionsMap.remove(key, sessionExpiryDate);
 				        } 				
 					}
 				}
 				
-				System.out.println("Size of HashMap is " + liveSessionsMap.size());
+				//System.out.println("Size of HashMap is " + liveSessionsMap.size());
 				
 			} catch (Exception e) {
 			}			
