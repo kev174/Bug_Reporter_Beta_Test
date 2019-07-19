@@ -20,13 +20,13 @@ public class ConnectToDB implements ConnectToDBInter {
 	private String credentialsDB = "credentials";
 	// NUIG 
 	//private String databaseLink = "jdbc:mysql://mysql1.it.nuigalway.ie:3306/mydb2976?autoReconnect=true&useSSL=false";
-	//private String un = "mydb2976ck", pw = "fa4nel";  
+	//private String un = " ", pw = " ";  
 	// GEAR.HOST
-	//private String databaseLink = "jdbc:mysql://den1.mysql1.gear.host:3306/bugfiles?autoReconnect=true&useSSL=false";
-	//private String un = "bugfiles", pw = "Cusask!";	
+	//private String databaseLink = "jdbc:mysql://den1.mysql1:3306/bugfiles?autoReconnect=true&useSSL=false";
+	//private String un = "bugfiles", pw = " ";	
 	// Amazon AWS RDS
-	private String databaseLink = "jdbc:mysql://csitfyp.czjf7gxlchkh.eu-west-1.rds.amazonaws.com:3306/csitfyp?autoReconnect=true&useSSL=false";
-	private String un = "Cusask174", pw = "Cusask174";
+	private String databaseLink = "jdbc:mysql://csitfyp:3306/csitfyp?autoReconnect=true&useSSL=false";
+	private String un = "Cusask", pw = "Cusask";
 	
 
 	public String changeBugStatus (int id, String todaysDate) throws SQLException { 
