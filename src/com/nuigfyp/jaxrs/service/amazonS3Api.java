@@ -125,10 +125,7 @@ public class amazonS3Api {
 
 	private static AmazonS3 setCredentials() {
 
-		AWSCredentials credentials = new BasicAWSCredentials(appId, appSecret);
-		@SuppressWarnings("deprecation")
-		AmazonS3 s3 = new AmazonS3Client(credentials);
-		return s3;
+		// Removed Login Info
 		
 	}
 
