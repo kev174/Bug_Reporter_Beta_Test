@@ -34,7 +34,7 @@
         <dependency>
 		    <groupId>com.amazonaws</groupId>
 		    <artifactId>aws-java-sdk-s3</artifactId>
-		    <version>1.11.390</version>
+		    <version>1.12.261</version>
 		</dependency>
         
         <!-- These two Dependency are required. as POSTMAN was not receiving a Json object back.
